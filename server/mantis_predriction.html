@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <title>Cazará la mantis</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+    <style>
+      #resultado {
+        font-weight:  bold;
+        font-size:  1.2rem;
+        text-align: center;
+      }
+    </style>
+
+  </head>
+  <body>
+    
+    <main>
+      <div class="px-4 py-2 my-2 text-center border-bottom">
+        <img class="d-block mx-auto mb-2" src="metaia.png" alt="" width="80" height="80">
+        <h1 class="display-5 fw-bold">Cazará la mantis</h1>
+        <div class="col-lg-6 mx-auto">
+          <p class="lead mb-0">Predicción de la caza de la mantis china utilizando Tensorflow.js</p>
+          <p class="lead mb-4">El detalle del modelo generado puedes verlo en <a href="https://colab.research.google.com/drive/1Qrir0yAVj_Gvmk3EnytYZ9t2y8yrbQtu?usp=sharing">este Notebook</a></p>
+        </div>
+      </div>
+
+      <div class="b-example-divider"></div>
+
+      <div class="container mt-5">
+        <div class="row">
+          <div class="col-12 col-md-4 offset-md-4">
+            <form>
+              <div class="mb-3">
+                <label for="humedad" class="form-label">Nivel húmedad: <span id="lbl-humedad">60</span></label>
+                <input type="range" class="form-range" min="30" max="90" id="humedad" oninput="actualizarValores();">
+              </div>
+              <div class="mb-3">
+                <label for="celsius" class="form-label">Temperatura: <span id="lbl-celsius">27</span></label>
+                <input type="range" class="form-range" min="20" max="35" id="celsius" oninput="actualizarValores();">
+              </div>
+              <div class="mb-3">
+                <label for="time" class="form-label">Tiempo empleado en la caza: <span id="lbl-time">5</span></label>
+                <input type="range" class="form-range" min="1" max="10" id="time" oninput="actualizarValores();">
+              </div>
+              <div class="mb-3">
+                <label for="tamano" class="form-label">Tamaño de la presa: <span id="lbl-tamano">10</span></label>
+                <input type="range" class="form-range" min="1" max="20" id="tamano" oninput="actualizarValores();">
+              </div>
+              <div class="mb-3">
+                <label for="selectOption" class="form-label">Momento de la caza: <span id="lbl-option"></span></label>
+                <select class="form-select" id="selectOption" >
+                    <option>Mañana</option>
+                    <option>Tarde</option>
+                    <option>Noche</option>
+                    <!-- Puedes agregar más opciones aquí -->
+                </select>
+                <div class="form-text">Selecciona una opción de la lista</div>
+              </div>
+              <div class="mb-3">
+                <label for="selectOptionFood" class="form-label">Disponibilidad de comida: <span id="lbl-option"></span></label>
+                <select class="form-select" id="selectOptionFood" >
+                    <option>Alta</option>
+                    <option>Media</option>
+                    <option>Baja</option>
+                    <!-- Puedes agregar más opciones aquí -->
+                </select>
+                <div class="form-text">Selecciona una opción de la lista</div>
+              </div>
+              <div class="mb-3">
+                <label for="luringCheckbox" class="form-label">Usa un señuelo: <span id="lbl-checkbox"></span></label>
+                <input type="checkbox" class="form-check-input" id="luringCheckbox">
+                
+              </div>
+              <div class="mb-3">
+                <label for="ambushCheckbox" class="form-label">Practica una emboscada: <span id="lbl-checkbox"></span></label>
+                <input type="checkbox" class="form-check-input" id="ambushCheckbox">
+                
+              </div>
+              <div class="mb-3">
+                <label for="predatorCheckbox" class="form-label">Hay presencia de predadores: <span id="lbl-checkbox"></span></label>
+                <input type="checkbox" class="form-check-input" id="predatorCheckbox">
+                
+              </div>
+              <div class="mb-3">
+                <label for="competitionCheckbox" class="form-label">Compite con otras mantis: <span id="lbl-checkbox"></span></label>
+                <input type="checkbox" class="form-check-input" id="competitionCheckbox">
+                
+              </div>
+              <div class="mb-3">
+                </label>
+                <input type="button" onClick="predecir()" class="" id="predictionButton" value="Predicción"></div>
+                
+              </div>
+              <div class="mb-3">
+                <label for="celsius" class="form-label">Resultado</label>
+                <div id="resultado">
+
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div class="b-example-divider"></div>
+
+      <div class="bg-dark text-secondary mt-5 px-4 py-2 text-center">
+        <div class="py-5">
+          <h1 class="display-5 fw-bold text-white">Skyteck</h1>
+          <div class="col-lg-6 mx-auto">
+            <p class="fs-5 mb-4">Revisa <a href="https://github.com/skyteck8/BigDataMachineLearning">el código</a> en mi github en al carpeta Server</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="b-example-divider mb-0"></div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.0.0/dist/tf.min.js"></script>
+
+    <script type="text/javascript">
+
+      var modelo = null;
+
+      //Cargar modelo
+      (async () => {
+          console.log("Cargando modelo...");
+          modelo = await tf.loadLayersModel("model.json");
+          console.log("Modelo cargado...");
+      })();
+
+
+      function escalarNumericos(valor, minOriginal, maxOriginal, minNuevo, maxNuevo) {
+          return minNuevo + ((maxNuevo - minNuevo) * (valor - minOriginal)) / (maxOriginal - minOriginal);
+      }
+
+      function escalar(){
+        var humedad=escalarNumericos(document.getElementById("humedad").value/100,0.3,0.9,-1.7307,1.7309);
+        var temp=escalarNumericos(document.getElementById("celsius").value,20.0,35.0,-1.7315,1.7333);
+        var time=escalarNumericos(document.getElementById("time").value,1.0,10.0,-1.6562,5.1842);
+        var tamano=escalarNumericos(document.getElementById("tamano").value,1.0,21.0,-1.6538,5.3349);
+        var timeDayAfternoon=0.;
+        var timeDayEvening=0.;
+        var timeDayMorning=0.;
+        var luringFalse=0.;
+        var luringTrue=0.;
+        var ambushFalse=0.;
+        var ambushTrue=0.;
+        var foodAvailabilityHigh=0.;
+        var foodAvailabilityLow=0.;
+        var foodAvailabilityMedium=0.;
+        var predatorPresenceFalse=0.;
+        var predatorPresenceTrue=0.;
+        var isCompetitionFalse=0.;
+        var isCompetitionTrue=0.;
+        
+        // Asigna 1.0 si el checkbox está marcado, de lo contrario 0.0
+        var luringFalse = document.getElementById("luringCheckbox").checked ? 0.0 : 1.0;
+        var luringTrue = document.getElementById("luringCheckbox").checked ? 1.0 : 0.0;
+
+        var ambushFalse = document.getElementById("ambushCheckbox").checked ? 0.0 : 1.0;
+        var ambushTrue = document.getElementById("ambushCheckbox").checked ? 1.0 : 0.0;
+
+        var predatorPresenceFalse = document.getElementById("predatorCheckbox").checked ? 0.0 : 1.0;
+        var predatorPresenceTrue = document.getElementById("predatorCheckbox").checked ? 1.0 : 0.0;
+
+        var isCompetitionFalse = document.getElementById("competitionCheckbox").checked ? 0.0 : 1.0;
+        var isCompetitionTrue = document.getElementById("competitionCheckbox").checked ? 1.0 : 0.0;
+
+
+
+        //setearTrues();
+        var selectedOption = document.getElementById("selectOption").value;
+
+        // Asignamos 1.0 a la variable correspondiente
+        switch (selectedOption) {
+            case "Tarde":
+                timeDayAfternoon = 1.0;
+                break;
+            case "Noche":
+                timeDayEvening = 1.0;
+                break;
+            case "Mañana":
+                timeDayMorning = 1.0;
+                break;
+            // Agrega más casos aquí si agregas más opciones
+        }
+
+        var selectedOptionFood = document.getElementById("selectOptionFood").value;
+
+        // Asignamos 1.0 a la variable correspondiente
+        switch (selectedOptionFood) {
+            case "Alta":
+                foodAvailabilityHigh = 1.0;
+                break;
+            case "Media":
+                foodAvailabilityMedium = 1.0;
+                break;
+            case "Baja":
+                  foodAvailabilityLow = 1.0;
+                break;
+            // Agrega más casos aquí si agregas más opciones
+        }
+
+
+
+        var dataEscalada=[[ humedad,  temp, time, tamano,  timeDayAfternoon        ,
+        timeDayEvening        ,  timeDayMorning        ,  luringFalse        ,  luringTrue        ,
+        ambushFalse        ,  ambushTrue        ,  foodAvailabilityHigh        ,  foodAvailabilityLow        ,  foodAvailabilityMedium        ,
+        predatorPresenceFalse        ,  predatorPresenceTrue        ,  isCompetitionFalse        , isCompetitionTrue]];
+        console.log(dataEscalada);
+        return dataEscalada;
+      }
+
+      function pintaResultado(prediccion){
+        console.log("pintandoReultado"+prediccion);
+        var img = document.createElement('img');
+        var numeroAleatorio = Math.random();
+        var texto="";
+        if (prediccion > 0.5) {
+            // Crea un nuevo elemento de imagen
+            
+            img.src = 'https://media1.tenor.com/m/xL-Dtj3O0WsAAAAC/fly-mantis.gif'; // Reemplaza con la URL de tu GIF
+            texto="Capturada";
+
+            // Agrega el elemento de imagen al div
+            
+        }else if(numeroAleatorio > 0.5){
+          img.src = 'https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExaHUxZjljeWFuNWk4N2duZGxjbDl1YzhsYjg4ZDdqdjBlbG5hdGs1OSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/OYy7jLugMfYze/giphy.gif';
+          texto="No ha cazado a la presa";
+        }else{
+          img.src = 'https://media1.tenor.com/m/geIcBPyqBpgAAAAC/bug-cat.gif';
+          texto="No ha cazado a la presa";
+        }
+
+        var resultadoDiv = document.getElementById('resultado');
+        resultadoDiv.innerHTML=texto;
+        resultadoDiv.appendChild(img);
+      }
+
+      function predecir(){
+        datatoEscalada=escalar();
+        datatoPredict=tf.tensor2d(datatoEscalada);
+        modelo.predict(datatoPredict).data().then(prediccion => {
+            pintaResultado(prediccion[0]);
+            console.log(prediccion);
+            console.log(prediccion[0]);
+            });
+        
+      }
+
+
+
+      function actualizarValores() {
+        var humedad = document.getElementById("humedad").value;
+        document.getElementById("lbl-humedad").innerHTML=humedad;
+
+        var celsius = document.getElementById("celsius").value;
+        document.getElementById("lbl-celsius").innerHTML=celsius;
+
+        var time = document.getElementById("time").value;
+        document.getElementById("lbl-time").innerHTML=time;
+
+        var tamano = document.getElementById("tamano").value;
+        document.getElementById("lbl-tamano").innerHTML=tamano;
+      }
+
+
+          /*var tensor = tf.tensor2d([[ 1.15397093,  1.24827086, -0.03471607, -0.40484741,  0.        ,
+        1.        ,  0.        ,  0.        ,  1.        ,  0.        ,
+        1.        ,  0.        ,  1.        ,  0.        ,  0.        ,
+        1.        ,  1.        ,  0.        ]]);*/
+          //var prediccion = modelo.predict(tensor).dataSync();
+          //var prediccion = modelo.predict(tensor).dataSync()
+         
+    </script>
+  </body>
+</html>
